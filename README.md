@@ -17,6 +17,7 @@ In the `preferences.yaml` file, you should set the applications you'd like to us
 The defaults (which give away my GNOME heritage) are:
 
 ```yaml
+# preferences.yaml
 viewers:
     pdf: evince
     img: gthumb
@@ -24,7 +25,16 @@ viewers:
 
 You will also need a **Canvas access key**.
 You can generate one of these by going to Settings and scrolling down to the *Approved integrations* section.
-Then, paste your generated access key into a `token` file in the project root.
+
+Once you have your access key, you can put it in the `credentials.yaml` file along with the URL of your institution's Canvas instance.
+
+```yaml
+# credentials.yaml
+url: https://canvas...
+token: 123456789...
+```
+
+Alternatively, the script will prompt you for these credentials when you first run it, and will update the file accordingly.
 
 ## Usage
 

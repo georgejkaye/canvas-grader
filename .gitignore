@@ -1,5 +1,5 @@
 # Project-specific
-token
+credentials.yaml
 submissions/
 .vscode/
 

@@ -10,7 +10,6 @@ with open("preferences.yaml") as f:
     prefs = yaml.load(f, Loader=yaml.FullLoader)
     PDF_READER = prefs["viewers"]["pdf"]
     IMG_READER = prefs["viewers"]["img"]
-    ODF_READER = prefs["viewers"]["odf"]
 
 if len(sys.argv) != 3:
     print("Needs at least two arguments: course code and assignment code")
@@ -19,26 +18,47 @@ if len(sys.argv) != 3:
 COURSE_ID = sys.argv[1]
 ASSG_ID = sys.argv[2]
 
-with open("token") as f:
-    token = f.readline()
+update = False
 
-API_URL = "https://canvas.bham.ac.uk/"
-API_KEY = token
+# hack to create the file if it doesn't exist
+open("credentials.yaml", "a+").close()
 
-canvas = Canvas(API_URL, API_KEY)
-print("You are: " + canvas.get_current_user())
+# we need readwrite in case we need to update the credentials
+with open("credentials.yaml", "r+") as f:
+    creds = yaml.load(f, Loader=yaml.FullLoader)
+    if creds and "url" in creds and creds["url"] != "":
+        API_URL = creds["url"]
+    else:
+        API_URL = input("Canvas URL: ")
+        update = True
+    if creds and "token" in creds and creds["token"] != "":
+        API_KEY = creds["token"]
+    else:
+        API_KEY = input("Access token: ")
+        update = True
 
+    if update:
+        f.write("url: " + API_URL)
+        f.write("\n")
+        f.write("token: " + API_KEY)
 
+# Try to connect to Canvas
+try:
+    canvas = Canvas(API_URL, API_KEY)
+except Exception as e:
+    print("Could not connect to Canvas, exiting...")
+    quit()
+
+print("Current user: " + str(canvas.get_current_user()))
 course = canvas.get_course(COURSE_ID)
 print("Course name: " + course.name)
-
 assg = course.get_assignment(ASSG_ID)
 print("Assignment name: " + course.name)
 
+# We want all the submissions
 subs = assg.get_submissions()
 
 for sub in subs:
-
     print("Marking submission " + str(sub.id))
     processes = []
 
@@ -57,7 +77,6 @@ for sub in subs:
             # download the attachment
             path = os.path.join("submissions",  str(sub.id) + "." + extension)
             urllib.request.urlretrieve(url, path)
-
             # open the submission
             p = subprocess.Popen(app + " " + path, shell=True)
             # add process to list so we can kill it later
