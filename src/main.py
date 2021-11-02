@@ -6,10 +6,12 @@ import os
 import sys
 import yaml
 
-with open("preferences.yaml") as f:
-    prefs = yaml.load(f, Loader=yaml.FullLoader)
-    PDF_READER = prefs["viewers"]["pdf"]
-    IMG_READER = prefs["viewers"]["img"]
+with open("associations.yaml") as f:
+    assocs = yaml.load(f, Loader=yaml.FullLoader)
+    PDF_READER = assocs["pdf"]
+    IMG_READER = assocs["img"]
+    TAR_READER = assocs["tar"]
+    ZIP_READER = assocs["zip"]
 
 if len(sys.argv) != 3:
     print("Needs at least two arguments: course code and assignment code")
@@ -70,8 +72,14 @@ for sub in subs:
             if ctype == "application/pdf":
                 extension = "pdf"
                 app = PDF_READER
+            elif ctype == "application/x-tar":
+                extension = "tar.gz"
+                app = TAR_READER
+            elif ctype == "application/zip":
+                extension = "zip"
+                app = TAR_READER
             else:
-                print("Unhandled file type, skipping...")
+                print("Unhandled file type " + ctype + " , skipping...")
                 continue
 
             # download the attachment
