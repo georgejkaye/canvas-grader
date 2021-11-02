@@ -3,8 +3,19 @@ import urllib.request
 import subprocess
 import tkinter as tk
 import os
+from os import path
 import sys
 import yaml
+import shutil
+
+# clean up past submissions
+if path.exists("submissions"):
+    if path.isdir("submissions"):
+        shutil.rmtree("submissions")
+    else:
+        os.remove("submissions")
+
+os.mkdir("submissions")
 
 with open("associations.yaml") as f:
     assocs = yaml.load(f, Loader=yaml.FullLoader)
